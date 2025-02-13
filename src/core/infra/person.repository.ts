@@ -12,6 +12,7 @@ import {
     where,
     doc,
     setDoc,
+    getDoc,
 } from "firebase/firestore/lite";
 
 const db = getFirestore(app);
@@ -46,8 +47,28 @@ export async function queryPerson() {
 
     querySnapshot.forEach(doc => {
         // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
+        console.log(">>> queryPerson: ", doc.id, " => ", doc.data());
     });
 
     return querySnapshot;
+}
+
+export async function getPerson(idDoc: string) {
+    const docRef = doc(db, "person", idDoc);
+    const docSnap = await getDoc(docRef);
+
+    let person: Person | undefined = undefined;
+
+    if (docSnap.exists()) {
+        //console.log("Document data:", docSnap.data());
+        person = { ...docSnap.data() } as Person;
+    }
+
+    //else {
+    // docSnap.data() will be undefined in this case
+    //console.log("No such document!");
+    //}
+
+    console.log(">>> getPerson ", person);
+    return person;
 }
